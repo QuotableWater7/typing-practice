@@ -7,6 +7,25 @@ const padEnd = require('lodash/fp/padEnd')
 const prompt = require('prompt-promise')
 const chalk = require('chalk')
 
+const options = [
+	{
+		letters: () => "asdfghjkl;'",
+		description: 'Home keys',
+	},
+	{
+		letters: () => "qwertyuiop",
+		description: 'Top keys',
+	},
+	{
+		letters: () => "zxcvbnm,./",
+		description: 'Bottom keys',
+	},
+	{
+		letters: () => "abcdefghijklmnopqrstuvwxyz,./;'",
+		description: 'All keys',
+	},
+]
+
 function randomChar({ listOfCandidates }) {
 	return listOfCandidates[Math.floor(Math.random() * listOfCandidates.length)]
 }
@@ -31,25 +50,6 @@ async function runner(length, listOfCandidates) {
 
 	await prompt('')
 }
-
-const options = [
-	{
-		letters: () => "asdfghjkl;'",
-		description: 'Home keys',
-	},
-	{
-		letters: () => "qwertyuiop",
-		description: 'Top keys',
-	},
-	{
-		letters: () => "zxcvbnm,./",
-		description: 'Bottom keys',
-	},
-	{
-		letters: () => "abcdefghijklmnopqrstuvwxyz,./;'",
-		description: 'All keys',
-	},
-]
 
 function printOptionsMenu() {
 	console.log(chalk.yellow('Choose a practice drill or enter -1 to quit'))
