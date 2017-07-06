@@ -54,21 +54,22 @@ async function runner(length, listOfCandidates) {
 	console.log(generateString({ length, listOfCandidates }))
 
 	await prompt('')
+	console.log('')
 }
 
-function printOptionsMenu() {
-	console.log(chalk.yellow('Choose a practice drill or enter -1 to quit'))
+function printOptionsMenu({ options, index = 0 }) {
+	if (index === 0) {
+		console.log(chalk.yellow('Choose a practice drill or enter -1 to quit'))
+	} else if (index > options.length - 1) {
+		return
+	}
 
-	let index = 0
-
-	each(option => {
-		console.log(`${padEnd(4, index, '.')}${option.description}`)
-		index++
-	}, options)
+	console.log(`${padEnd(4, index, '.')}${options[index].description}`)
+	printOptionsMenu({ options, index: index + 1 })
 }
 
 function getUserChoice({ options }) {
-	printOptionsMenu()
+	printOptionsMenu({ options })
 
 	return prompt('').then(choice => {
 		if (!options[choice] && choice !== '-1') {
