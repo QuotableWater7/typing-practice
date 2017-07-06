@@ -30,23 +30,28 @@ function randomChar({ listOfCandidates }) {
 	return listOfCandidates[Math.floor(Math.random() * listOfCandidates.length)]
 }
 
-function getStringToType({ length, listOfCandidates }) {
-	let lastChar = ' '
+function lastChar({ string }) {
+	return string[string.length - 1]
+}
 
-	return times(
-		() => {
-			lastChar = (lastChar !== ' ' && Math.random() < .2) ?
-			  ' ' :
-				randomChar({ listOfCandidates })
+function getNextChar({ listOfCandidates, currentString }) {
+	return lastChar({ string: currentString }) !== ' ' && Math.random() < .2 ?
+		' ' :
+		randomChar({ listOfCandidates })
+}
 
-			return lastChar
-		},
-		length
-	).join('')
+function generateString({ length, listOfCandidates, currentString = '' }) {
+	return currentString.length === length ?
+		currentString :
+		generateString({
+			length,
+			listOfCandidates,
+			currentString: currentString + getNextChar({ listOfCandidates, currentString }),
+		})
 }
 
 async function runner(length, listOfCandidates) {
-	console.log(getStringToType({ length, listOfCandidates }))
+	console.log(generateString({ length, listOfCandidates }))
 
 	await prompt('')
 }
