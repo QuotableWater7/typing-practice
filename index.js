@@ -1,5 +1,6 @@
 'use strict'
 
+const every = require('lodash/fp/every')
 const each = require('lodash/fp/each')
 const times = require('lodash/fp/times')
 const flowRight = require('lodash/fp/flowRight')
@@ -30,14 +31,28 @@ function randomChar({ listOfCandidates }) {
 	return listOfCandidates[Math.floor(Math.random() * listOfCandidates.length)]
 }
 
-function lastChar({ string }) {
+function lastChar(string) {
 	return string[string.length - 1]
 }
 
+function isSpace(string) {
+	return string === ' '
+}
+
+const not = x => !x
+
+const isLastCharNotSpace = flowRight(not, isSpace, lastChar)
+
+const isRandomNumberLessThan = decimal => Math.random() < decimal
+
+const nextCharShouldBeSpace = currentString => (
+	currentString !== '' &&
+	isLastCharNotSpace(currentString) &&
+	isRandomNumberLessThan(.2)
+)
+
 function getNextChar({ listOfCandidates, currentString }) {
-	return lastChar({ string: currentString }) !== ' ' && Math.random() < .2 ?
-		' ' :
-		randomChar({ listOfCandidates })
+	return nextCharShouldBeSpace() ? ' ' : randomChar({ listOfCandidates })
 }
 
 function generateString({ length, listOfCandidates, currentString = '' }) {
@@ -95,5 +110,11 @@ async function main() {
 	}).then(main)
 }
 
-main()
+const run = () => main()
 	.then(process.exit)
+	.catch(error => {
+		console.log(error.stack)
+		return run()
+	})
+
+run()
