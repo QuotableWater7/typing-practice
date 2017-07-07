@@ -52,7 +52,7 @@ const nextCharShouldBeSpace = currentString => (
 )
 
 function getNextChar({ listOfCandidates, currentString }) {
-	return nextCharShouldBeSpace() ? ' ' : randomChar({ listOfCandidates })
+	return nextCharShouldBeSpace(currentString) ? ' ' : randomChar({ listOfCandidates })
 }
 
 function generateString({ length, listOfCandidates, currentString = '' }) {
