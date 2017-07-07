@@ -50,8 +50,8 @@ function generateString({ length, listOfCandidates, currentString = '' }) {
 		})
 }
 
-async function runner(length, listOfCandidates) {
-	console.log(generateString({ length, listOfCandidates }))
+async function executeTypingSession({ length, letters }) {
+	console.log(generateString({ length, listOfCandidates: letters }))
 
 	await prompt('')
 	console.log('')
@@ -85,11 +85,14 @@ async function main() {
 	const choice = await getUserChoice({ options })
 
 	if (choice === -1) {
-		console.log(chalk.cyan('\nGoodbye!\n'))
+		console.log(chalk.cyan('\n** Goodbye **!\n'))
 		return 0
 	}
 
-	await runner(20, options[choice].letters()).then(main)
+	await executeTypingSession({
+		length: 20,
+		letters: options[choice].letters(),
+	}).then(main)
 }
 
 main()
