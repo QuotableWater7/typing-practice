@@ -11,19 +11,19 @@ const chalk = require('chalk')
 const options = [
 	{
 		letters: () => "asdfghjkl;'",
-		description: 'Home keys',
+		description: () => 'Home keys',
 	},
 	{
 		letters: () => "qwertyuiop",
-		description: 'Top keys',
+		description: () => 'Top keys',
 	},
 	{
 		letters: () => "zxcvbnm,./",
-		description: 'Bottom keys',
+		description: () => 'Bottom keys',
 	},
 	{
 		letters: () => "abcdefghijklmnopqrstuvwxyz,./;'",
-		description: 'All keys',
+		description: () => 'All keys',
 	},
 ]
 
@@ -65,11 +65,11 @@ function generateString({ length, listOfCandidates, currentString = '' }) {
 		})
 }
 
-async function executeTypingSession({ length, letters }) {
+const printRandomLetters = ({ length, letters }) =>
 	console.log(generateString({ length, listOfCandidates: letters }))
 
-	await prompt('')
-	console.log('')
+async function waitOnUserInput() {
+	return prompt('').then(() => console.log(''))
 }
 
 function printOptionsMenu({ options, index = 0 }) {
@@ -79,7 +79,7 @@ function printOptionsMenu({ options, index = 0 }) {
 		return
 	}
 
-	console.log(`${padEnd(4, index, '.')}${options[index].description}`)
+	console.log(`${padEnd(4, index, '.')}${options[index].description()}`)
 	printOptionsMenu({ options, index: index + 1 })
 }
 
@@ -96,21 +96,23 @@ function getUserChoice({ options }) {
 	})
 }
 
-async function main() {
+async function executeTypingSession() {
 	const choice = await getUserChoice({ options })
 
 	if (choice === -1) {
-		console.log(chalk.cyan('\n** Goodbye **!\n'))
+		console.log(chalk.cyan('\n** Goodbye :( **!\n'))
 		return 0
 	}
 
-	await executeTypingSession({
+	await printRandomLetters({
 		length: 20,
 		letters: options[choice].letters(),
-	}).then(main)
+	})
+
+	await waitOnUserInput().then(executeTypingSession)
 }
 
-const run = () => main()
+const run = () => executeTypingSession()
 	.then(process.exit)
 	.catch(error => {
 		console.log(error.stack)
