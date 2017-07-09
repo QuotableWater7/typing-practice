@@ -27,8 +27,8 @@ const options = [
 	},
 ]
 
-function randomChar({ listOfCandidates }) {
-	return listOfCandidates[Math.floor(Math.random() * listOfCandidates.length)]
+function randomChar({ letters }) {
+	return letters[Math.floor(Math.random() * letters.length)]
 }
 
 function lastChar(string) {
@@ -51,26 +51,26 @@ const nextCharShouldBeSpace = currentString => (
 	isRandomNumberLessThan(.2)
 )
 
-function getNextChar({ listOfCandidates, currentString }) {
-	return nextCharShouldBeSpace(currentString) ? ' ' : randomChar({ listOfCandidates })
+function getNextChar({ letters, currentString }) {
+	return nextCharShouldBeSpace(currentString) ? ' ' : randomChar({ letters })
 }
 
-function generateString({ length, listOfCandidates, currentString = '' }) {
+function generateString({ length, letters, letterModifier, currentString = '' }) {
 	return currentString.length === length ?
 		currentString :
 		generateString({
 			length,
-			listOfCandidates,
-			currentString: currentString + getNextChar({ listOfCandidates, currentString }),
+			letters,
+			letterModifier,
+			currentString: currentString + letterModifier(
+				getNextChar({ letters, currentString }),
+			),
 		})
 }
 
-const printRandomLetters = ({ length, letters }) =>
-	console.log(generateString({ length, listOfCandidates: letters }))
+const printRandomLetters = (...args) => console.log(generateString(...args))
 
-async function waitOnUserInput() {
-	return prompt('').then(() => console.log(''))
-}
+const waitOnUserInput = async () => prompt('').then(() => console.log(''))
 
 function printOptionsMenu({ options, index = 0 }) {
 	if (index === 0) {
@@ -96,6 +96,16 @@ function getUserChoice({ options }) {
 	})
 }
 
+const getLetterModifier = mixCapsChoice => char => {
+	if (mixCapsChoice === '1') {
+		return char.toLowerCase()
+	} else if (mixCapsChoice === '2') {
+		return char.toUpperCase()
+	} else if (mixCapsChoice === '3') {
+		return Math.random() > .5 ? char.toUpperCase() : char.toLowerCase()
+	}
+}
+
 async function executeTypingSession() {
 	const choice = await getUserChoice({ options })
 
@@ -104,9 +114,14 @@ async function executeTypingSession() {
 		return 0
 	}
 
+	const mixCapsChoice = await prompt(
+		'1 for lowercase only, 2 for uppercase only, 3 for mixed\n'
+	)
+
 	await printRandomLetters({
 		length: 20,
 		letters: options[choice].letters(),
+		letterModifier: getLetterModifier(mixCapsChoice),
 	})
 
 	await waitOnUserInput().then(executeTypingSession)
