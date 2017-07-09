@@ -1,5 +1,3 @@
-'use strict'
-
 const every = require('lodash/fp/every')
 const each = require('lodash/fp/each')
 const times = require('lodash/fp/times')
@@ -68,9 +66,13 @@ function generateString({ length, letters, letterModifier, currentString = '' })
 		})
 }
 
-const printRandomLetters = (...args) => console.log(generateString(...args))
+const printRandomLetters = (...args) => console.log(
+	chalk.magenta(
+		generateString(...args)
+	)
+)
 
-const waitOnUserInput = async () => prompt('').then(() => console.log(''))
+const waitOnUserInput = () => prompt('')
 
 function printOptionsMenu({ options, index = 0 }) {
 	if (index === 0) {
@@ -87,8 +89,10 @@ function getUserChoice({ options }) {
 	printOptionsMenu({ options })
 
 	return prompt('').then(choice => {
+		clearScreen()
+
 		if (!options[choice] && choice !== '-1') {
-			console.log(chalk.red('\nInvalid choice - please select from the available options'))
+			console.log(chalk.red('Invalid choice - please select from the available options'))
 			return getUserChoice({ options })
 		}
 
@@ -106,17 +110,20 @@ const getLetterModifier = mixCapsChoice => char => {
 	}
 }
 
+const clearScreen = () => console.log('\033c')
+
 async function executeTypingSession() {
 	const choice = await getUserChoice({ options })
 
 	if (choice === -1) {
-		console.log(chalk.cyan('\n** Goodbye :( **!\n'))
+		console.log(chalk.cyan('** Goodbye :( **!'))
 		return 0
 	}
 
 	const mixCapsChoice = await prompt(
 		'1 for lowercase only, 2 for uppercase only, 3 for mixed\n'
 	)
+	clearScreen()
 
 	await printRandomLetters({
 		length: 20,
@@ -124,7 +131,10 @@ async function executeTypingSession() {
 		letterModifier: getLetterModifier(mixCapsChoice),
 	})
 
-	await waitOnUserInput().then(executeTypingSession)
+	await waitOnUserInput().then(() => {
+		clearScreen()
+		return executeTypingSession()
+	})
 }
 
 const run = () => executeTypingSession()
@@ -134,4 +144,5 @@ const run = () => executeTypingSession()
 		return run()
 	})
 
+clearScreen()
 run()
